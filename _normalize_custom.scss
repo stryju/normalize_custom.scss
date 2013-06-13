@@ -1,4 +1,4 @@
-/*! normalize.css v1.0.0 | MIT License | git.io/normalize */
+/*! normalize.css v2.1.0 | MIT License | git.io/normalize */
 
 /*
  * usage:
@@ -10,8 +10,8 @@
  * // this will print out minimal set (*) -- you can see the list of "excluded" tags below
  * @include normalize( $include : none );
  *
- * // this will print out minimal set + article, but without form ( and anything related to form, like input )
- * @include normalize( $include : article, $exclude : form );
+ * // this will print out minimal set + article, but without form ( and anything related to form, like input ) and h1-h6 tags
+ * @include normalize( $include : article, $exclude : form "h*" );
  */
 
 /*
@@ -20,6 +20,7 @@
  * - article
  * - aside
  * - audio
+ * - blockquote
  * - canvas
  * - code
  * - details
@@ -48,7 +49,7 @@
  */
 
 
-@function in-list( $value, $list ) {
+@function in-list( $value, $list ){
   $found : false;
   @each $item in $list {
     @if $value == $item {
@@ -63,7 +64,7 @@
   $list,
   $extend,
   $is-in-list : true
-) {
+){
   @each $element in $elements {
     $found : false;
 
@@ -86,9 +87,9 @@
 }
 
 @mixin normalize(
-  $include : abbr article aside audio canvas code details dfn fieldset figcaption figure footer header hgroup kdb legend mark menu nav q samp section small sub summary sup svg table video,
+  $include : abbr article aside audio blockquote canvas code details dfn fieldset figcaption figure footer header hgroup kdb legend main mark menu nav q samp section small sub summary sup svg table video,
   $exclude : none
-) {
+){
 
   ///// base css placeholders /////
 
@@ -181,16 +182,14 @@
 
   // pre
   %normalized-pre {
-    white-space: pre;
     white-space: pre-wrap;
-    word-wrap: break-word;
   }
 
   // input, select, button, textarea
   /*
-   * 1. Corrects font family not being inherited in all browsers.
-   * 2. Corrects font size not being inherited in all browsers.
-   * 3. Addresses margins set differently in Firefox 4+, Safari 5, and Chrome
+   * 1. Correct font family not being inherited in all browsers.
+   * 2. Correct font size not being inherited in all browsers.
+   * 3. Address margins set differently in Firefox 4+, Safari 5, and Chrome.
    */
   %normalized-inputs {
     font-family: inherit; /* 1 */
@@ -200,19 +199,21 @@
 
   // button, input[type="submit"], input[type="button"] ...
   /*
-   * 1. Corrects inability to style clickable `input` types in iOS.
-   * 2. Improves usability and consistency of cursor style between image-type
+   * 2. Corrects inability to style clickable `input` types in iOS.
+   * 3. Improves usability and consistency of cursor style between image-type
    *    `input` and others.
+   * 4. Removes inner spacing in IE 7 without affecting normal text inputs.
+   *    Known issue: inner spacing remains in IE 6.
    */
   %normalized-button {
-    -webkit-appearance: button; /* 1 */
-    cursor: pointer; /* 2 */
+    -webkit-appearance: button; /* 2 */
+    cursor: pointer; /* 3 */
   }
 
   // input[type="checkbox"], input[type="radio"]
   /*
-   * 1. Addresses box sizing set to content-box in IE 8/9.
-   * 2. Removes excess padding in IE 8/9.
+   * 1. Address box sizing set to `content-box` in IE 8/9.
+   * 2. Remove excess padding in IE 8/9.
    */
   %normalized-checkable {
     box-sizing: border-box; /* 1 */
@@ -222,7 +223,7 @@
 
   // ::-moz-focus-inner
   /*
-   * Removes inner padding and border in Firefox 4+.
+   * Removes inner padding and border in Firefox 3+.
    */
   %normalized-moz-focus-inner {
     @if not in-list( "::-moz-focus-inner", $exclude ) {
@@ -236,16 +237,16 @@
      ========================================================================== */
 
   /*
-   * Corrects `block` display not defined in IE 8/9.
+   * Corrects `block` display not defined in IE 6/7/8/9 and Firefox 3.
    */
   @include if-in-list(
-    $elements : article aside details figcaption figure footer header hgroup nav section summary,
+    $elements : article aside details figcaption figure footer header hgroup main nav section summary,
     $list     : $include,
     $extend   : normalize-display-block
   );
 
   /*
-   * Corrects `inline-block` display not defined in IE 8/9.
+   * Corrects `inline-block` display not defined in IE 6/7/8/9 and Firefox 3.
    */
   @include if-in-list(
     $elements : audio canvas video,
@@ -264,8 +265,9 @@
     }
   }
 
+
   /*
-   * Addresses styling for `hidden` attribute not present in IE 8/9.
+   * Address styling not present in IE 8/9.
    */
   @if not in-list( '[hidden]', $exclude ) {
     [hidden] {
@@ -278,8 +280,8 @@
      ========================================================================== */
 
   /*
-   * 1. Sets default font family to sans-serif.
-   * 2. Prevents iOS text size adjust after orientation change, without disabling
+   * 1. Set default font family to sans-serif.
+   * 2. Prevent iOS text size adjust after orientation change, without disabling
    *    user zoom.
    */
   @if not in-list( html, $exclude ) {
@@ -290,12 +292,14 @@
     }
   }
 
+
   /*
-   * Removes default margin.
+   * Remove default margin.
    */
+
   @if not in-list( body, $exclude ) {
     body {
-      margin: 0;
+      @extend %normalize-margin-0;
     }
   }
 
@@ -312,7 +316,6 @@
             outline: thin dotted;
         }
       }
-
       /*
        * Improves readability when focused and also mouse hovered in all browsers.
        */
@@ -330,18 +333,20 @@
      ========================================================================== */
 
   /*
-   * Addresses `h1` font sizes within `section` and `article` in Firefox 4+,
-   * Safari 5, and Chrome.
+   * Address variable `h1` font-size and margin within `section` and `article`
+   * contexts in Firefox 4+, Safari 5, and Chrome.
    */
   @if not in-list( h1, $exclude ) {
     h1 {
-        font-size: 2em;
+      font-size: 2em;
+      margin: 0.67em 0;
     }
   }
 
   /*
    * Addresses styling not present in IE 8/9, Safari 5, and Chrome.
    */
+
   @if in-list( abbr, $include ) {
     abbr[title] {
       border-bottom: 1px dotted;
@@ -349,7 +354,7 @@
   }
 
   /*
-   * Addresses style set to `bolder` in Firefox 4+, Safari 5, and Chrome.
+   * Addresses style set to `bolder` in Firefox 3+, Safari 4/5, and Chrome.
    */
   @include if-in-list(
     $elements   : b strong,
@@ -368,6 +373,17 @@
   }
 
   /*
+   * Address differences between Firefox and other browsers.
+   */
+  @if not-in-list( hr, $exclude ) {
+    hr {
+      -moz-box-sizing: content-box;
+           box-sizing: content-box;
+      height: 0;
+    }
+  }
+
+  /*
    * Addresses styling not present in IE 8/9.
    */
   @if in-list( mark, $include ) {
@@ -378,10 +394,20 @@
   }
 
   /*
-   * Corrects font family set oddly in Safari 5 and Chrome.
+   * Addresses margins set differently in IE 6/7.
    */
   @include if-in-list(
-    $elements : code kdb samp,
+    $elements   : p pre,
+    $list       : $exclude,
+    $extend     : normalize-margin-1em-0,
+    $is-in-list : false
+  );
+
+  /*
+   * Corrects font family set oddly in IE 6, Safari 4/5, and Chrome.
+   */
+  @include if-in-list(
+    $elements : code kdb pre samp,
     $list     : $include,
     $extend   : normalize-font-mono
   );
@@ -391,13 +417,13 @@
    */
   @if not in-list( pre, $exclude ) {
     pre {
-      @extend %normalize-font-mono;
       @extend %normalized-pre;
     }
   }
 
+
   /*
-   * Sets consistent quote types.
+   * Set consistent quote types.
    */
   @if in-list( q, $include ) {
     q {
@@ -406,7 +432,7 @@
   }
 
   /*
-   * Addresses inconsistent and variable font size in all browsers.
+   * Address inconsistent and variable font size in all browsers.
    */
   @if in-list( small, $include ) {
     small {
@@ -435,8 +461,8 @@
      Embedded content
      ========================================================================== */
 
-   /*
-   * Removes border when inside `a` element in IE 8/9.
+  /*
+   * Remove border when inside `a` element in IE 8/9.
    */
   @if not in-list( img, $exclude ) {
     img {
@@ -453,12 +479,13 @@
     }
   }
 
+
   /* ==========================================================================
      Figures
      ========================================================================== */
 
   /*
-   * Addresses margin not present in IE 8/9 and Safari 5.
+   * Addresses margin not present in IE 6/7/8/9, Safari 5, and Opera 11.
    */
   @if in-list( figure, $include ) {
     figure {
@@ -466,23 +493,24 @@
     }
   }
 
+
   /* ==========================================================================
      Forms
      ========================================================================== */
-
   @if not in-list( form, $exclude ) {
+
     /*
      * Define consistent border, margin, and padding.
      */
     @if in-list( fieldset, $include ) {
       fieldset {
-          border: 1px solid #c0c0c0;
-          margin: 0 2px;
-          padding: 0.35em 0.625em 0.75em;
+        border: 1px solid #c0c0c0;
+        margin: 0 2px;
+        padding: 0.35em 0.625em 0.75em;
       }
 
       /*
-       * 1. Corrects color not being inherited in IE 8/9.
+       * 1. Correct `color` not being inherited in IE 8/9.
        * 2. Remove padding so people aren't caught out if they zero out fieldsets.
        */
        @if in-list( legend, $include ) {
@@ -500,9 +528,8 @@
       $is-in-list : false
     );
 
-
     /*
-     * Addresses Firefox 3+ setting `line-height` on `input` using `!important` in
+     * Address Firefox 4+ setting `line-height` on `input` using `!important` in
      * the UA stylesheet.
      */
      @include if-in-list(
@@ -557,9 +584,6 @@
           }
         }
 
-        /*
-         * see %normalized-button for notes
-         */
         @include if-in-list(
           $elements   : 'input[type="reset"]' 'input[type="submit"]',
           $list       : $exclude,
@@ -568,7 +592,10 @@
         );
 
         /*
-         * see %normalized-checkable for notes
+         * 1. Addresses box sizing set to content-box in IE 8/9.
+         * 2. Removes excess padding in IE 8/9.
+         * 3. Removes excess padding in IE 7.
+         *    Known issue: excess padding remains in IE 6.
          */
         @if not in-list( ":checkable", $exclude ) {
           @include if-in-list(
@@ -605,7 +632,7 @@
     }
 
     /*
-     * 1. Removes default vertical scrollbar in IE 8/9.
+     * 1. Removes default vertical scrollbar in IE 6/7/8/9.
      * 2. Improves readability and alignment in all browsers.
      */
     @if not in-list( textarea, $exclude ) {
